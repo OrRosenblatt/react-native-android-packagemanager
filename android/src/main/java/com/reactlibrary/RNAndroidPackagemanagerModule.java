@@ -1,26 +1,36 @@
 package com.reactlibrary;
 
+import android.app.Activity;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.Intent;
+import android.net.Uri;
 
+import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.BaseActivityEventListener;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class RNAndroidPackagemanagerModule extends ReactContextBaseJavaModule {
 
-  private final ReactApplicationContext reactContext;
+  private final PackagesInfoRetriever packagesInfoRetriever;
+  private final PackagesActions packagesActions;
 
   public RNAndroidPackagemanagerModule(ReactApplicationContext reactContext) {
     super(reactContext);
-    this.reactContext = reactContext;
+    this.packagesInfoRetriever = new PackagesInfoRetriever(reactContext);
+    this.packagesActions = new PackagesActions(reactContext);
   }
 
   @Override
@@ -29,44 +39,17 @@ public class RNAndroidPackagemanagerModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void getPackageInfo(String path, Promise promise) {
-    try {
-      PackageManager pm = this.reactContext.getPackageManager();
-      PackageInfo pi = pm.getPackageArchiveInfo(path, 0);
-
-      PackageInfoMapping info = new PackageInfoMapping.Builder(pi, pm).withLabel(true).build();
-      WritableMap map = info.asWritableMap();
-
-      promise.resolve(map);
-    }
-    catch (Exception ex) {
-      ex.printStackTrace();
-      promise.reject(null, ex.getMessage());
-    }
+  public void getPackageInfo(String fullPath, Promise promise) {
+    this.packagesInfoRetriever.getPackageInfo(fullPath, promise);
   }
 
   @ReactMethod
   public void getInstalledPackages(ReadableMap options, Promise promise) {
-    try {
-      WritableArray array = Arguments.createArray();
+    this.packagesInfoRetriever.getInstalledPackages(options, promise);
+  }
 
-      boolean loadLabel = options != null && options.hasKey("loadLabel") ? options.getBoolean("loadLabel") : false;
-
-      PackageManager pm = this.reactContext.getPackageManager();
-      List<PackageInfo> packages = pm.getInstalledPackages(0);
-      for (PackageInfo pi : packages)
-      {
-        PackageInfoMapping info = new PackageInfoMapping.Builder(pi, pm).withLabel(loadLabel).build();
-        WritableMap map = info.asWritableMap();
-
-        array.pushMap(map);
-      }
-
-      promise.resolve(array);
-    }
-    catch (Exception ex) {
-      ex.printStackTrace();
-      promise.reject(null, ex.getMessage());
-    }
+  @ReactMethod
+  public void uninstallPackage(String packageName, Promise promise) {
+    this.packagesActions.uninstallPackage(packageName, promise);
   }
 }
