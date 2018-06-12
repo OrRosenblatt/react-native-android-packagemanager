@@ -15,9 +15,9 @@ export interface PackageInfo {
 }
 
 declare class RNAndroidPackagemanager {
-    static getPackageInfo(path: string): Promise<PackageInfo>;
+    static getPackageInfo(fullPath: string): Promise<PackageInfo>;
     static getInstalledPackages(options: {loadLabel: boolean}): Promise<PackageInfo[]>;
-    static uninstallPackage(path: string): Promise<void>;
+    static uninstallPackage(packageName: string): Promise<void>;
 }
 
 export default RNAndroidPackagemanager;

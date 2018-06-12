@@ -30,10 +30,10 @@ public class PackagesInfoRetriever {
         this.reactContext = reactContext;
     }
 
-    public void getPackageInfo(String path, Promise promise) {
+    public void getPackageInfo(String fullPath, Promise promise) {
         try {
             PackageManager pm = this.reactContext.getPackageManager();
-            PackageInfo pi = pm.getPackageArchiveInfo(path, 0);
+            PackageInfo pi = pm.getPackageArchiveInfo(fullPath, 0);
 
             PackageInfoMapping info = new PackageInfoMapping.Builder(pi, pm).withLabel(true).build();
             WritableMap map = info.asWritableMap();

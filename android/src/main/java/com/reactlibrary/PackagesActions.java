@@ -57,8 +57,8 @@ public class PackagesActions {
     this.reactContext.addActivityEventListener(this.activityEventListener);
   }
 
-  public void uninstallPackage(String path, Promise promise) {
-    if (!this.isAppInstalled(path)) {
+  public void uninstallPackage(String packageName, Promise promise) {
+    if (!this.isAppInstalled(packageName)) {
       promise.reject(APP_NOT_FOUND_KEY, APP_NOT_FOUND_KEY);
       return;
     }
@@ -66,7 +66,7 @@ public class PackagesActions {
     try {
       this.uninstallPromise = promise;
       Intent intent = new Intent(Intent.ACTION_UNINSTALL_PACKAGE);
-      intent.setData(Uri.parse("package:" + path));
+      intent.setData(Uri.parse("package:" + packageName));
       intent.putExtra(Intent.EXTRA_RETURN_RESULT, true);
       this.reactContext.getCurrentActivity().startActivityForResult(intent, UNINSTALL_REQUEST_CODE);
     } catch (Exception ex) {
@@ -76,10 +76,10 @@ public class PackagesActions {
     }
   }
 
-  private boolean isAppInstalled(String path) {
+  private boolean isAppInstalled(String packageName) {
     try {
       PackageManager pm = this.reactContext.getPackageManager();
-      PackageInfo pi = pm.getPackageInfo(path, PackageManager.GET_ACTIVITIES);
+      PackageInfo pi = pm.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES);
       return true;
     } catch (Exception ex) {
       ex.printStackTrace();

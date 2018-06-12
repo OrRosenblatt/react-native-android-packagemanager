@@ -39,8 +39,8 @@ public class RNAndroidPackagemanagerModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void getPackageInfo(String path, Promise promise) {
-    this.packagesInfoRetriever.getPackageInfo(path, promise);
+  public void getPackageInfo(String fullPath, Promise promise) {
+    this.packagesInfoRetriever.getPackageInfo(fullPath, promise);
   }
 
   @ReactMethod
@@ -49,7 +49,7 @@ public class RNAndroidPackagemanagerModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void uninstallPackage(String path, Promise promise) {
-    this.packagesActions.uninstallPackage(path, promise);
+  public void uninstallPackage(String packageName, Promise promise) {
+    this.packagesActions.uninstallPackage(packageName, promise);
   }
 }
