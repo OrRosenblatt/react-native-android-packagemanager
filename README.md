@@ -32,7 +32,7 @@ Gives you some access to Android's [PackageManager](https://developer.android.co
 ## Usage
 
 ```javascript
-import RNAndroidPM from 'react-native-android-packagemanager';
+import RNAndroidPM, { UNINSTALL_ERRORS } from 'react-native-android-packagemanager';
 
 RNAndroidPM.getPackageInfo('/storage/emulated/0/myapp.apk').then(info => {
     console.log(info);
@@ -78,7 +78,7 @@ RNAndroidPM.getInstalledPackages({}).then(packages => {
 RNAndroidPM.uninstallPackage('com.developer.app')
     .then(() => console.log('uninstall finished successfully'))
     .catch(err => {
-        switch (expr) {
+        switch (err.code) {
             case UNINSTALL_ERRORS.APP_NOT_FOUND:
             case UNINSTALL_ERRORS.USER_DECLINED:
                 //...
