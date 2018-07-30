@@ -16,21 +16,24 @@ public class PackageInfoMapping {
   private long firstInstallTime;
   private long lastUpdateTime;
   private boolean isSystemApp;
+  private String appIconBase64;
 
-  private PackageInfoMapping(PackageInfo packageInfo, ApplicationInfo applicationInfo, String label) {
+  private PackageInfoMapping(PackageInfo packageInfo, ApplicationInfo applicationInfo, String label, String appIconBase64) {
     this.label = label;
+    this.appIconBase64 = appIconBase64;
     this.packageName = packageInfo.packageName;
     this.versionName = packageInfo.versionName;
     this.versionCode = packageInfo.versionCode;
     this.firstInstallTime = packageInfo.firstInstallTime;
     this.lastUpdateTime = packageInfo.lastUpdateTime;
-    this.isSystemApp = (applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0;
+    this.isSystemApp = (applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0;   
   }
 
   public WritableMap asWritableMap() {
     WritableMap map = Arguments.createMap();
 
     map.putString("label", this.label);
+    map.putString("appIconBase64", this.appIconBase64);
     map.putString("package", this.packageName);
     map.putString("versionName", this.versionName);
     map.putInt("versionCode", this.versionCode);
@@ -47,11 +50,14 @@ public class PackageInfoMapping {
     private PackageInfo packageInfo;
     private PackageManager packageManager;
     private ApplicationInfo applicationInfo;
+    private String appIconBase64;
 
-    public Builder(PackageInfo packageInfo, PackageManager packageManager) {
+
+    public Builder(PackageInfo packageInfo, PackageManager packageManager, String appIconBase64) {
       this.packageInfo = packageInfo;
       this.packageManager = packageManager;
       this.applicationInfo = packageInfo.applicationInfo;
+      this.appIconBase64 = appIconBase64;
     }
 
     public Builder withLabel(boolean loadLabel) {
@@ -61,7 +67,7 @@ public class PackageInfoMapping {
 
     public PackageInfoMapping build() {
       String label = this.loadLabel ? this.loadPackageLabel() : null;
-      return new PackageInfoMapping(this.packageInfo, this.applicationInfo, label);
+      return new PackageInfoMapping(this.packageInfo, this.applicationInfo, label, this.appIconBase64);
     }
 
     private String loadPackageLabel() {
