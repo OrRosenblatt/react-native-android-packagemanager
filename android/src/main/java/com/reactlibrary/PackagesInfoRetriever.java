@@ -3,8 +3,15 @@ package com.reactlibrary;
 import android.app.Activity;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ApplicationInfo;
 import android.content.Intent;
 import android.net.Uri;
+import 	android.content.pm.PackageManager.NameNotFoundException;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import 	android.util.Base64;
 
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Arguments;
@@ -21,6 +28,7 @@ import com.facebook.react.bridge.WritableMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.io.ByteArrayOutputStream;
 
 public class PackagesInfoRetriever {
 
@@ -74,24 +82,31 @@ public class PackagesInfoRetriever {
         if(packageName.isEmpty() ) return new String("");
 
         String base64Encoded = "";
-        Bitmap bitmap;
+        Bitmap bitmap, smallBitmap;
 
         try {
             Drawable appIcon = getAppDrawableIcon(packageManager, packageName);
+            if (appIcon == null) return "";
+
             if(appIcon instanceof BitmapDrawable) {
                 bitmap= ((BitmapDrawable)appIcon).getBitmap();
             } else {
                 bitmap = Bitmap.createBitmap(appIcon.getIntrinsicWidth(), appIcon.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
             }
+            smallBitmap = Bitmap.createScaledBitmap(bitmap, 45, 45, false);
 
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.PNG, 90, byteArrayOutputStream);
-            byte[] byteArray = byteArrayOutputStream .toByteArray();
-            base64Encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
+            if (smallBitmap.compress(Bitmap.CompressFormat.WEBP, 90, byteArrayOutputStream)) {
+                byte[] byteArray = byteArrayOutputStream .toByteArray();
+                base64Encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
+            }
+        
+                
 
         } catch(Exception ex) {
               ex.printStackTrace();
         }
+     
 
         return  base64Encoded;
     }
@@ -101,10 +116,7 @@ public class PackagesInfoRetriever {
             ApplicationInfo app = packageManager.getApplicationInfo(pckageName, 0);        
 
             Drawable icon = packageManager.getApplicationIcon(app);
-            String name = packageManager.getApplicationLabel(app);
 
-            Bitmap icon = BitmapFactory.decodeResource(context.getResources(),
-                                           R.drawable.icon_resource);
             return icon;
         } catch (NameNotFoundException e) {
            return null;
