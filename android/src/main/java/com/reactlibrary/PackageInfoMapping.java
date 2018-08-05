@@ -33,13 +33,15 @@ public class PackageInfoMapping {
     WritableMap map = Arguments.createMap();
 
     map.putString("label", this.label);
-    map.putString("appIconBase64", this.appIconBase64);
     map.putString("package", this.packageName);
     map.putString("versionName", this.versionName);
     map.putInt("versionCode", this.versionCode);
     map.putDouble("firstInstallTime", this.firstInstallTime);
     map.putDouble("lastUpdateTime", this.lastUpdateTime);
     map.putBoolean("isSystemApp", this.isSystemApp);
+    if (this.appIconBase64 != null) {
+      map.putString("appIconBase64", this.appIconBase64);
+    }
 
     return map;
   }
@@ -54,10 +56,14 @@ public class PackageInfoMapping {
 
 
     public Builder(PackageInfo packageInfo, PackageManager packageManager, String appIconBase64) {
+      this(packageInfo, packageManager);      
+      this.appIconBase64 = appIconBase64;
+    }
+
+    public Builder(PackageInfo packageInfo, PackageManager packageManager) {      
       this.packageInfo = packageInfo;
       this.packageManager = packageManager;
       this.applicationInfo = packageInfo.applicationInfo;
-      this.appIconBase64 = appIconBase64;
     }
 
     public Builder withLabel(boolean loadLabel) {

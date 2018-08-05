@@ -42,9 +42,8 @@ public class PackagesInfoRetriever {
         try {
             PackageManager pm = this.reactContext.getPackageManager();
             PackageInfo pi = pm.getPackageArchiveInfo(fullPath, 0);
-            String appIconBase64Encode = getBitmapOfAnAppAsBase64(pm, pi.packageName);   
 
-            PackageInfoMapping info = new PackageInfoMapping.Builder(pi, pm, appIconBase64Encode).withLabel(true).build();
+            PackageInfoMapping info = new PackageInfoMapping.Builder(pi, pm).withLabel(true).build();
             WritableMap map = info.asWritableMap();
 
             promise.resolve(map);
@@ -60,11 +59,19 @@ public class PackagesInfoRetriever {
 
             boolean loadLabel = options != null && options.hasKey("loadLabel") ? options.getBoolean("loadLabel")
                     : false;
+            boolean shouldGetAppsIcons = options != null && options.hasKey("shouldGetAppsIcons") ? options.getBoolean("shouldGetAppsIcons")
+                    : false;
+            int iconPixelSquareSize = options != null && options.hasKey("iconPixelSquareSize") ? options.getInt("iconPixelSquareSize")
+                    : 45;
 
             PackageManager pm = this.reactContext.getPackageManager();
             List<PackageInfo> packages = pm.getInstalledPackages(0);
-            for (PackageInfo pi : packages) {
-                String appIconBase64Encode = getBitmapOfAnAppAsBase64(pm, pi.packageName);                
+          
+            for (PackageInfo pi : packages) {   
+                String appIconBase64Encode = null;            
+                if (shouldGetAppsIcons) {
+                    appIconBase64Encode = getBitmapOfAnAppAsBase64(pm, pi.packageName, iconPixelSquareSize);                
+                }
                 PackageInfoMapping info = new PackageInfoMapping.Builder(pi, pm, appIconBase64Encode).withLabel(loadLabel).build();
                 WritableMap map = info.asWritableMap();
 
@@ -78,7 +85,8 @@ public class PackagesInfoRetriever {
         }
     }
 
-    private String getBitmapOfAnAppAsBase64(PackageManager packageManager, String packageName) {
+
+    private String getBitmapOfAnAppAsBase64(PackageManager packageManager, String packageName, int iconPixelSquareSize) {
         if(packageName.isEmpty() ) return new String("");
 
         String base64Encoded = "";
@@ -93,15 +101,13 @@ public class PackagesInfoRetriever {
             } else {
                 bitmap = Bitmap.createBitmap(appIcon.getIntrinsicWidth(), appIcon.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
             }
-            smallBitmap = Bitmap.createScaledBitmap(bitmap, 45, 45, false);
+            smallBitmap = Bitmap.createScaledBitmap(bitmap, iconPixelSquareSize, iconPixelSquareSize, false);
 
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            if (smallBitmap.compress(Bitmap.CompressFormat.WEBP, 90, byteArrayOutputStream)) {
+            if (smallBitmap.compress(Bitmap.CompressFormat.PNG, 90, byteArrayOutputStream)) {
                 byte[] byteArray = byteArrayOutputStream .toByteArray();
                 base64Encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
-            }
-        
-                
+            }   
 
         } catch(Exception ex) {
               ex.printStackTrace();
