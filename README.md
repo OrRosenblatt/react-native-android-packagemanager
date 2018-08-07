@@ -104,7 +104,7 @@ int. resize the icon to square size appIconSizeInPixel X appIconSizeInPixel pixe
 ```javascript
 import RNAndroidPM, { UNINSTALL_ERRORS } from 'react-native-android-packagemanager';
 
-RNAndroidPM.getInstalledPackages({loadLabel: true, shouldGetAppsIcons: true, iconPixelSquareSize: 45}).then(info => {
+RNAndroidPM.getInstalledPackages({loadLabel: true, includeAppIcon: true, appIconSizeInPixel: 45}).then(info => {
     console.log(info);
     /*
       {
