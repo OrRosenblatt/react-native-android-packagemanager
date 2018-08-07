@@ -3,8 +3,10 @@ package com.reactlibrary;
 import android.app.Activity;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ApplicationInfo;
 import android.content.Intent;
 import android.net.Uri;
+
 
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Arguments;
@@ -51,11 +53,17 @@ public class PackagesInfoRetriever {
 
             boolean loadLabel = options != null && options.hasKey("loadLabel") ? options.getBoolean("loadLabel")
                     : false;
+            boolean includeAppIcon = options != null && options.hasKey("includeAppIcon") ? options.getBoolean("includeAppIcon")
+                    : false;
+            int appIconSizeInPixel = options != null && options.hasKey("appIconSizeInPixel") ? options.getInt("appIconSizeInPixel")
+                    : 45;
 
             PackageManager pm = this.reactContext.getPackageManager();
             List<PackageInfo> packages = pm.getInstalledPackages(0);
-            for (PackageInfo pi : packages) {
-                PackageInfoMapping info = new PackageInfoMapping.Builder(pi, pm).withLabel(loadLabel).build();
+          
+            for (PackageInfo pi : packages) {   
+               
+                PackageInfoMapping info = new PackageInfoMapping.Builder(pi, pm).withLabel(loadLabel).includeAppIcon(includeAppIcon, appIconSizeInPixel).build();
                 WritableMap map = info.asWritableMap();
 
                 array.pushMap(map);
