@@ -91,15 +91,15 @@ RNAndroidPM.uninstallPackage('com.developer.app')
         }
     });
 ```
-### PackageVersion 1.5.0 Icons Support
+### PackageVersion 1.4.0 Icons Support
 #### getInstalledPackages
-As from Version 1.5.0 getInstalledPackages gets additional params inside options dictionary:
+As from Version 1.4.0 getInstalledPackages gets additional params inside options dictionary:
 ##### loadLabel
 boolean. Indicates if we want to get the app's label.
-##### shouldGetAppsIcons
+##### includeAppIcon
 boolean. Indicates if we want to get apps icons as base64 encoding string of PNG format.
-##### iconPixelSquareSize
-int. reize the icon to square size iconPixelSquareSize X iconPixelSquareSize pixels. Default size 45X45 pixels
+##### appIconSizeInPixel
+int. resize the icon to square size appIconSizeInPixel X appIconSizeInPixel pixels. Default size 45X45 pixels
 
 ```javascript
 import RNAndroidPM, { UNINSTALL_ERRORS } from 'react-native-android-packagemanager';
@@ -119,3 +119,12 @@ RNAndroidPM.getInstalledPackages({loadLabel: true, shouldGetAppsIcons: true, ico
       }
     */
 ```
+
+Using the base64 string for React img
+```
+    <img className={styles.appIcon} src={'data:image/png;base64,' + app.appIconBase64} />
+
+    // define width & height in appIcon style
+``` 
+
+
