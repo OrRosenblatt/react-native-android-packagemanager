@@ -33,6 +33,7 @@ public class PackagesActions {
 
   private ReactApplicationContext reactContext;
   private PackagesInfoRetriever packagesInfoRetriever;
+  private String packageName;
   private Promise uninstallPromise;
   private final ActivityEventListener activityEventListener = new BaseActivityEventListener() {
     @Override
@@ -42,10 +43,15 @@ public class PackagesActions {
         if (resultCode == Activity.RESULT_OK) {
           uninstallPromise.resolve(true);
         } else if (resultCode == USER_DECLINED_CODE) {
-          uninstallPromise.reject(USER_DECLINED_KEY, USER_DECLINED_KEY);
+          if ((packageName != null) && !isAppInstalled(packageName)) {
+            uninstallPromise.resolve(true);
+          } else {
+            uninstallPromise.reject(USER_DECLINED_KEY, USER_DECLINED_KEY);
+          }
         } else if (resultCode == UNINSTALL_FAILED_CODE) {
           uninstallPromise.reject(UNINSTALL_FAILED_KEY, UNINSTALL_FAILED_KEY);
         }
+        packageName = null;
         uninstallPromise = null;
       }
     }
@@ -64,6 +70,7 @@ public class PackagesActions {
     }
 
     try {
+      this.packageName = packageName;
       this.uninstallPromise = promise;
       Intent intent = new Intent(Intent.ACTION_UNINSTALL_PACKAGE);
       intent.setData(Uri.parse("package:" + packageName));
@@ -72,6 +79,7 @@ public class PackagesActions {
     } catch (Exception ex) {
       ex.printStackTrace();
       promise.reject(UNINSTALL_FAILED_KEY, ex.getMessage());
+      this.packageName = null;
       this.uninstallPromise = null;
     }
   }
